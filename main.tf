@@ -65,3 +65,20 @@ resource "google_storage_bucket_iam_member" "reader_sa_permission" {
   role   = "roles/storage.objectViewer"
   member = "serviceAccount:${module.reader_sa.email}"
 }
+
+module "writer_sa" {
+  source       = "airasia/service_account/google"
+  version      = "1.1.0"
+  providers    = { google = google }
+  name_suffix  = var.name_suffix
+  account_id   = "gcs-writer-${random_string.random_id.result}"
+  display_name = "gcs-${google_storage_bucket.gcs_bucket.name}-object-writer"
+  description  = "Allowed to CRUD objects in the '${google_storage_bucket.gcs_bucket.name}' GCS bucket"
+}
+
+resource "google_storage_bucket_iam_member" "writer_sa_permission" {
+  count  = var.enable_writer_sa ? 1 : 0
+  bucket = google_storage_bucket.gcs_bucket.name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${module.writer_sa.email}"
+}

@@ -62,6 +62,12 @@ variable "enable_reader_sa" {
   default     = false
 }
 
+variable "enable_writer_sa" {
+  description = "Whether to enable permissions of the writer ServiceAccount to be able to CRUD objects in the GCS bucket."
+  type        = bool
+  default     = false
+}
+
 variable "labels" {
   description = "A map of key-value string labels for organizing the GCS bucket."
   type        = map(string)
