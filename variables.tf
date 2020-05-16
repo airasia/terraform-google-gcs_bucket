@@ -56,6 +56,12 @@ variable "object_admin_usergroups" {
   default     = []
 }
 
+variable "enable_reader_sa" {
+  description = "Whether to enable permissions of the reader ServiceAccount to be able to read all objects from the GCS bucket."
+  type        = bool
+  default     = false
+}
+
 variable "labels" {
   description = "A map of key-value string labels for organizing the GCS bucket."
   type        = map(string)

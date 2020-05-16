@@ -15,6 +15,12 @@ locals {
 
 data "google_client_config" "google_client" {}
 
+resource "random_string" "random_id" {
+  length  = 4
+  special = false
+  upper   = false
+}
+
 resource "google_project_service" "storage_api" {
   service            = "storage-api.googleapis.com"
   disable_on_destroy = false
@@ -41,4 +47,21 @@ resource "google_storage_bucket_iam_member" "object_admins" {
   bucket = google_storage_bucket.gcs_bucket.name
   role   = "roles/storage.objectAdmin"
   member = "group:${var.object_admin_usergroups[count.index]}"
+}
+
+module "reader_sa" {
+  source       = "airasia/service_account/google"
+  version      = "1.1.0"
+  providers    = { google = google }
+  name_suffix  = var.name_suffix
+  account_id   = "gcs-reader-${random_string.random_id.result}"
+  display_name = "gcs-${google_storage_bucket.gcs_bucket.name}-object-reader"
+  description  = "Allowed to read all objects from the '${google_storage_bucket.gcs_bucket.name}' GCS bucket"
+}
+
+resource "google_storage_bucket_iam_member" "reader_sa_permission" {
+  count  = var.enable_reader_sa ? 1 : 0
+  bucket = google_storage_bucket.gcs_bucket.name
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${module.reader_sa.email}"
 }

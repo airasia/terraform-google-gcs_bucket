@@ -4,3 +4,8 @@ output "usage_IAM_roles" {
     "roles/storage.objectAdmin",
   ]
 }
+
+output "reader_sa_email" {
+  description = "Email address of a ServiceAccount that may have permission(s) to read all objects in the GCS bucket."
+  value       = module.reader_sa.email
+}
