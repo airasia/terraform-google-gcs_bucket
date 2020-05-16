@@ -35,3 +35,10 @@ resource "google_storage_bucket_iam_member" "public_viewers" {
   role   = "roles/storage.objectViewer"
   member = "allUsers"
 }
+
+resource "google_storage_bucket_iam_member" "object_admins" {
+  count  = length(var.object_admin_usergroups)
+  bucket = google_storage_bucket.gcs_bucket.name
+  role   = "roles/storage.objectAdmin"
+  member = "group:${var.object_admin_usergroups[count.index]}"
+}

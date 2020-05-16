@@ -50,6 +50,12 @@ variable "versioning_enabled" {
   default     = false
 }
 
+variable "object_admin_usergroups" {
+  description = "List of email addresses of usergroups that may have permission to administer (CRUD) objects in the GCS bucket."
+  type        = list(string)
+  default     = []
+}
+
 variable "labels" {
   description = "A map of key-value string labels for organizing the GCS bucket."
   type        = map(string)
