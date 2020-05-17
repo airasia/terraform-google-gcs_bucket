@@ -54,7 +54,7 @@ module "reader_sa" {
   version      = "1.1.1"
   providers    = { google = google }
   name_suffix  = var.name_suffix
-  account_id   = "gcs-reader-${random_string.random_id.result}"
+  account_id   = "gcs-reader-sa-${random_string.random_id.result}"
   display_name = "gcs-${google_storage_bucket.gcs_bucket.name}-object-reader"
   description  = "Allowed to read all objects from the '${google_storage_bucket.gcs_bucket.name}' GCS bucket"
 }
@@ -64,7 +64,7 @@ module "writer_sa" {
   version      = "1.1.1"
   providers    = { google = google }
   name_suffix  = var.name_suffix
-  account_id   = "gcs-writer-${random_string.random_id.result}"
+  account_id   = "gcs-writer-sa-${random_string.random_id.result}"
   display_name = "gcs-${google_storage_bucket.gcs_bucket.name}-object-writer"
   description  = "Allowed to CRUD objects in the '${google_storage_bucket.gcs_bucket.name}' GCS bucket"
 }
