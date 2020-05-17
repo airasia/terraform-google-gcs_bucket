@@ -59,13 +59,6 @@ module "reader_sa" {
   description  = "Allowed to read all objects from the '${google_storage_bucket.gcs_bucket.name}' GCS bucket"
 }
 
-resource "google_storage_bucket_iam_member" "reader_sa_permission" {
-  count  = var.enable_reader_sa ? 1 : 0
-  bucket = google_storage_bucket.gcs_bucket.name
-  role   = "roles/storage.objectViewer"
-  member = "serviceAccount:${module.reader_sa.email}"
-}
-
 module "writer_sa" {
   source       = "airasia/service_account/google"
   version      = "1.1.1"
@@ -74,6 +67,13 @@ module "writer_sa" {
   account_id   = "gcs-writer-${random_string.random_id.result}"
   display_name = "gcs-${google_storage_bucket.gcs_bucket.name}-object-writer"
   description  = "Allowed to CRUD objects in the '${google_storage_bucket.gcs_bucket.name}' GCS bucket"
+}
+
+resource "google_storage_bucket_iam_member" "reader_sa_permission" {
+  count  = var.enable_reader_sa ? 1 : 0
+  bucket = google_storage_bucket.gcs_bucket.name
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${module.reader_sa.email}"
 }
 
 resource "google_storage_bucket_iam_member" "writer_sa_permission" {
