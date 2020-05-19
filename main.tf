@@ -51,7 +51,7 @@ resource "google_storage_bucket_iam_member" "object_admins" {
 
 module "reader_sa" {
   source       = "airasia/service_account/google"
-  version      = "1.1.1"
+  version      = "1.2.0"
   providers    = { google = google }
   name_suffix  = var.name_suffix
   account_id   = "gcs-reader-sa-${random_string.random_id.result}"
@@ -61,7 +61,7 @@ module "reader_sa" {
 
 module "writer_sa" {
   source       = "airasia/service_account/google"
-  version      = "1.1.1"
+  version      = "1.2.0"
   providers    = { google = google }
   name_suffix  = var.name_suffix
   account_id   = "gcs-writer-sa-${random_string.random_id.result}"
