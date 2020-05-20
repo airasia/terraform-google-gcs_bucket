@@ -73,9 +73,3 @@ variable "labels" {
   type        = map(string)
   default     = {}
 }
-
-variable "gcs_timeout" {
-  description = "How long a GCS bucket operation is allowed to take before being considered a failure."
-  type        = string
-  default     = "5m"
-}
