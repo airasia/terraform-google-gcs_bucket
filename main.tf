@@ -8,9 +8,14 @@ provider "google" {
 }
 
 locals {
-  bucket_name     = var.omit_name_suffix ? var.bucket_name : format("%s-%s", var.bucket_name, var.name_suffix)
   bucket_location = var.location != null ? var.location : data.google_client_config.google_client.region
   bucket_labels   = merge(var.labels, { "name_suffix" = var.name_suffix })
+  is_domain_name  = length(regexall("[.]", var.bucket_name)) > 0 # contains a dot/period
+  bucket_name = (
+    local.is_domain_name ? var.bucket_name : (
+      var.omit_name_suffix ? var.bucket_name : (
+        format("%s-%s", var.bucket_name, var.name_suffix)
+  )))
 }
 
 data "google_client_config" "google_client" {}

@@ -12,7 +12,7 @@ variable "name_suffix" {
 }
 
 variable "bucket_name" {
-  description = "A universally unique name for the bucket."
+  description = "A universally unique name for the bucket. Considered a 'domain name' if the value contains one (or more) period/dot [.]."
   type        = string
 }
 
