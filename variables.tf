@@ -33,19 +33,19 @@ variable "location" {
 }
 
 variable "uniform_access" {
-  description = "If set to true, all objects in the GCS bucket will have the same access levels (uniform). Set this to 'false' to be able to specify distinct access-levels to individual objects explicitly (fine-grained). Cannot be set to 'false' if 90 days have passed with the 'true' setting."
+  description = "If set to true, all objects in the GCS bucket will have the same access levels (uniform). Set this to 'false' to be able to specify distinct access-levels to individual objects explicitly (fine-grained). Cannot be set to 'false' if 90 days have passed with the 'true' setting.  Considered 'true' if 'var.bucket_name' is a domain name."
   type        = bool
   default     = false
 }
 
 variable "public_read" {
-  description = "Whether the objects in the GCS bucket should be publicly readable by the open internet or not."
+  description = "Whether the objects in the GCS bucket should be publicly readable by the open internet or not. Considered 'true' if 'var.bucket_name' is a domain name."
   type        = bool
   default     = false
 }
 
 variable "versioning_enabled" {
-  description = "Whether objects in the bucket should be versioneed or not."
+  description = "Whether objects in the bucket should be versioneed or not. Considered 'true' if 'var.bucket_name' is a domain name."
   type        = bool
   default     = false
 }
@@ -57,7 +57,7 @@ variable "object_admin_usergroups" {
 }
 
 variable "enable_reader_sa" {
-  description = "Whether to enable permissions of the reader ServiceAccount to be able to read all objects from the GCS bucket."
+  description = "Whether to enable permissions of the reader ServiceAccount to be able to read all objects from the GCS bucket. Considered 'false' (as it is unnecessary) if 'var.public_read' is 'true'."
   type        = bool
   default     = false
 }

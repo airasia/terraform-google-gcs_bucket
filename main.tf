@@ -16,6 +16,10 @@ locals {
       var.omit_name_suffix ? var.bucket_name : (
         format("%s-%s", var.bucket_name, var.name_suffix)
   )))
+  public_read        = local.is_domain_name ? true : var.public_read
+  uniform_access     = local.is_domain_name ? true : var.uniform_access
+  versioning_enabled = local.is_domain_name ? true : var.versioning_enabled
+  enable_reader_sa   = local.public_read ? false /* unnecessary */ : var.enable_reader_sa
 }
 
 data "google_client_config" "google_client" {}
@@ -35,13 +39,13 @@ resource "google_storage_bucket" "gcs_bucket" {
   name               = local.bucket_name
   location           = local.bucket_location
   labels             = local.bucket_labels
-  bucket_policy_only = var.uniform_access
-  versioning { enabled = var.versioning_enabled }
+  bucket_policy_only = local.uniform_access
+  versioning { enabled = local.versioning_enabled }
   depends_on = [google_project_service.storage_api]
 }
 
 resource "google_storage_bucket_iam_member" "public_viewers" {
-  count  = var.public_read ? 1 : 0
+  count  = local.public_read ? 1 : 0
   bucket = google_storage_bucket.gcs_bucket.name
   role   = "roles/storage.objectViewer"
   member = "allUsers"
@@ -75,7 +79,7 @@ module "writer_sa" {
 }
 
 resource "google_storage_bucket_iam_member" "reader_sa_permission" {
-  count  = var.enable_reader_sa ? 1 : 0
+  count  = local.enable_reader_sa ? 1 : 0
   bucket = google_storage_bucket.gcs_bucket.name
   role   = "roles/storage.objectViewer"
   member = "serviceAccount:${module.reader_sa.email}"
