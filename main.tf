@@ -40,10 +40,12 @@ resource "google_storage_bucket" "gcs_bucket" {
   location           = local.bucket_location
   labels             = local.bucket_labels
   bucket_policy_only = local.uniform_access
-  versioning { enabled = local.versioning_enabled }
   website {
     main_page_suffix = var.website_config.index_page
     not_found_page   = var.website_config.error_page
+  }
+  versioning {
+    enabled = local.versioning_enabled
   }
   depends_on = [google_project_service.storage_api]
 }
