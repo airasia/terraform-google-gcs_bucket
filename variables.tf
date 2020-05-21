@@ -50,6 +50,18 @@ variable "versioning_enabled" {
   default     = false
 }
 
+variable "website_config" {
+  description = "The default HTML pages that should be used for index and 404 pages."
+  type = object({
+    index_page = string
+    error_page = string
+  })
+  default = {
+    index_page = "index.html"
+    error_page = "404.html"
+  }
+}
+
 variable "object_admin_usergroups" {
   description = "List of email addresses of usergroups that may have permission to administer (CRUD) objects in the GCS bucket."
   type        = list(string)
