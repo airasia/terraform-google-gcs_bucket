@@ -5,12 +5,7 @@ output "usage_IAM_roles" {
   ]
 }
 
-output "reader_sa_email" {
-  description = "Email address of a ServiceAccount that may have permission(s) to read all objects in the GCS bucket."
-  value       = module.reader_sa.email
-}
-
-output "writer_sa_email" {
-  description = "Email address of a ServiceAccount that may have permission(s) to CRUD objects in the GCS bucket."
-  value       = module.writer_sa.email
+output "bucket_name" {
+  description = "Outputs the finally constructed bucket name. Will be necessary for external resources (eg: ServiceAccounts) to be granted permissions to read/write to."
+  value       = google_storage_bucket.gcs_bucket.name
 }

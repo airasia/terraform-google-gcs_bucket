@@ -20,12 +20,6 @@ variable "bucket_name" {
 # OPTIONAL PARAMETERS
 # ----------------------------------------------------------------------------------------------------------------------
 
-variable "omit_name_suffix" {
-  description = "Whether to include (or omit) the name suffix from being used in the bucket name."
-  type        = bool
-  default     = false
-}
-
 variable "location" {
   description = "Regional / Dual-Regional / Multi-Regional location of the GCS bucket. Defaults to the google provider's region if nothing is specified here. See https://cloud.google.com/storage/docs/locations#available_locations."
   type        = string
@@ -44,7 +38,7 @@ variable "public_read" {
   default     = false
 }
 
-variable "versioning_enabled" {
+variable "enable_versioning" {
   description = "Whether objects in the bucket should be versioneed or not. Considered 'true' if 'var.bucket_name' is a domain name."
   type        = bool
   default     = false
@@ -62,22 +56,10 @@ variable "website_config" {
   }
 }
 
-variable "object_admin_usergroups" {
+variable "admin_usergroups" {
   description = "List of email addresses of usergroups that may have permission to administer (CRUD) objects in the GCS bucket."
   type        = list(string)
   default     = []
-}
-
-variable "enable_reader_sa" {
-  description = "Whether to enable permissions of the reader ServiceAccount to be able to read all objects from the GCS bucket. Considered 'false' (as it is unnecessary) if 'var.public_read' is 'true'."
-  type        = bool
-  default     = false
-}
-
-variable "enable_writer_sa" {
-  description = "Whether to enable permissions of the writer ServiceAccount to be able to CRUD objects in the GCS bucket."
-  type        = bool
-  default     = false
 }
 
 variable "labels" {
