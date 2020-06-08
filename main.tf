@@ -14,7 +14,7 @@ locals {
   enable_versioning = local.is_domain_name ? true : var.enable_versioning
   bucket_name       = local.is_domain_name ? var.bucket_name : format("%s-%s", var.bucket_name, var.name_suffix)
   bucket_labels     = merge(var.labels, { "name_suffix" = var.name_suffix })
-  bucket_location   = var.location != null ? var.location : data.google_client_config.google_client.region
+  bucket_location   = var.location != "" ? var.location : data.google_client_config.google_client.region
 }
 
 data "google_client_config" "google_client" {}

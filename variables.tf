@@ -23,7 +23,7 @@ variable "bucket_name" {
 variable "location" {
   description = "Regional / Dual-Regional / Multi-Regional location of the GCS bucket. Defaults to the google provider's region if nothing is specified here. See https://cloud.google.com/storage/docs/locations#available_locations."
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "uniform_access" {
