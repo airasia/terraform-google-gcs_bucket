@@ -23,7 +23,7 @@ resource "google_storage_bucket" "gcs_bucket" {
   name               = local.bucket_name
   location           = local.bucket_location
   labels             = local.bucket_labels
-  bucket_policy_only = local.uniform_access
+  uniform_bucket_level_access = local.uniform_access
   force_destroy      = false
   website {
     main_page_suffix = var.website_config.index_page
