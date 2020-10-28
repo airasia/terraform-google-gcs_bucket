@@ -31,6 +31,11 @@ resource "google_storage_bucket" "gcs_bucket" {
   }
   versioning { enabled = local.enable_versioning }
   depends_on = [google_project_service.storage_api]
+  lifecycle {
+    ignore_changes = [ # See https://www.terraform.io/docs/configuration/resources.html#ignore_changes
+      cors # ignore CORS changes. Use 'gsutil' tool instead. See https://cloud.google.com/storage/docs/configuring-cors
+    ]
+  }
 }
 
 resource "google_storage_bucket_iam_member" "public_viewers" {
