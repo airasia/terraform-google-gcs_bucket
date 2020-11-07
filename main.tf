@@ -46,8 +46,8 @@ resource "google_storage_bucket_iam_member" "public_viewers" {
 }
 
 resource "google_storage_bucket_iam_member" "object_admins" {
-  count  = length(var.admin_usergroups)
+  for_each = toset(var.admin_usergroups)
   bucket = google_storage_bucket.gcs_bucket.name
   role   = "roles/storage.objectAdmin"
-  member = "group:${var.admin_usergroups[count.index]}"
+  member = "group:${each.value}"
 }
