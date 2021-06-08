@@ -80,25 +80,25 @@ resource "google_storage_bucket_iam_member" "object_admins" {
 
 resource "google_compute_backend_bucket" "bucket_backend" {
   count       = local.create_bucket_lb ? 1 : 0
-  name        = format("backend-bucket-%s", local.lb_resource_name_suffix)
+  name        = format("bucket-backend-%s", local.lb_resource_name_suffix)
   bucket_name = local.bucket_name
 }
 
 resource "google_compute_url_map" "url_map" {
   count           = local.create_bucket_lb ? 1 : 0
-  name            = format("lb-%s", local.lb_resource_name_suffix)
+  name            = format("bucket-lb-%s", local.lb_resource_name_suffix)
   default_service = google_compute_backend_bucket.bucket_backend.0.self_link
 }
 
 resource "google_compute_managed_ssl_certificate" "mcrt" {
   count = local.create_bucket_lb ? 1 : 0
-  name  = format("cert-%s", local.lb_resource_name_suffix)
+  name  = format("bucket-cert-%s", local.lb_resource_name_suffix)
   managed { domains = [local.bucket_name] }
 }
 
 resource "google_compute_target_https_proxy" "https_proxy" {
   count   = local.create_bucket_lb ? 1 : 0
-  name    = format("https-proxy-%s", local.lb_resource_name_suffix)
+  name    = format("bucket-proxy-%s", local.lb_resource_name_suffix)
   url_map = google_compute_url_map.url_map.0.self_link
   ssl_certificates = distinct(concat(
     [google_compute_managed_ssl_certificate.mcrt.0.id], local.lb_additional_cert_ids
@@ -114,7 +114,7 @@ resource "google_compute_global_address" "lb_ip" {
 
 resource "google_compute_global_forwarding_rule" "fw_rule" {
   count      = local.create_bucket_lb ? 1 : 0
-  name       = format("forwarding-rule-%s", local.lb_resource_name_suffix)
+  name       = format("bucket-forwarding-rule-%s", local.lb_resource_name_suffix)
   target     = google_compute_target_https_proxy.https_proxy.0.self_link
   ip_address = google_compute_global_address.lb_ip.0.address
   port_range = "443"
