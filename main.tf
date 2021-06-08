@@ -3,16 +3,16 @@ terraform {
 }
 
 locals {
-  is_domain_name        = length(regexall("[.]", var.bucket_name)) > 0 # contains a dot/period ?
-  public_read           = local.is_domain_name ? true : var.public_read
-  uniform_access        = local.is_domain_name ? true : var.uniform_access
-  enable_versioning     = local.is_domain_name ? true : var.enable_versioning
-  create_bucket_lb      = local.is_domain_name
-  bucket_name           = local.is_domain_name ? var.bucket_name : format("%s-%s", var.bucket_name, var.name_suffix)
-  bucket_labels         = merge(var.labels, { "name_suffix" = var.name_suffix })
-  bucket_location       = var.location != "" ? var.location : data.google_client_config.google_client.region
-  sanitized_bucket_name = replace(var.bucket_name, ".", "-")
-  lb_resource_name_suffix  = format("%s-%s", local.sanitized_bucket_name, var.name_suffix)
+  is_domain_name          = length(regexall("[.]", var.bucket_name)) > 0 # contains a dot/period ?
+  public_read             = local.is_domain_name ? true : var.public_read
+  uniform_access          = local.is_domain_name ? true : var.uniform_access
+  enable_versioning       = local.is_domain_name ? true : var.enable_versioning
+  create_bucket_lb        = local.is_domain_name
+  bucket_name             = local.is_domain_name ? var.bucket_name : format("%s-%s", var.bucket_name, var.name_suffix)
+  bucket_labels           = merge(var.labels, { "name_suffix" = var.name_suffix })
+  bucket_location         = var.location != "" ? var.location : data.google_client_config.google_client.region
+  sanitized_bucket_name   = replace(var.bucket_name, ".", "-")
+  lb_resource_name_suffix = format("%s-%s", local.sanitized_bucket_name, var.name_suffix)
 }
 
 data "google_client_config" "google_client" {}
