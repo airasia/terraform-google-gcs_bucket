@@ -110,5 +110,4 @@ resource "google_compute_global_forwarding_rule" "fw_rule" {
   target     = google_compute_target_https_proxy.https_proxy[0].self_link
   ip_address = google_compute_global_address.lb_ip[0].address
   port_range = "443"
-  depends_on = [google_compute_global_address.lb_ip]
 }
