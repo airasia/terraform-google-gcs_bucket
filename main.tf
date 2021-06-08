@@ -81,7 +81,20 @@ resource "google_compute_backend_bucket" "bucket_backend" {
 resource "google_compute_url_map" "url_map" {
   count           = local.is_domain_name ? 1 : 0
   name            = format("lb-%s", local.resource_name_suffix)
-  default_service = google_compute_backend_bucket.bucket_backend[0].self_link
+  default_service = google_compute_backend_bucket.bucket_backend.0.self_link
+}
+
+resource "google_compute_managed_ssl_certificate" "mcrt" {
+  count = local.is_domain_name ? 1 : 0
+  name  = format("cert-%s", local.resource_name_suffix)
+  managed { domains = [local.bucket_name] }
+}
+
+resource "google_compute_target_https_proxy" "https_proxy" {
+  count            = local.is_domain_name ? 1 : 0
+  name             = format("https-proxy-%s", local.resource_name_suffix)
+  url_map          = google_compute_url_map.url_map.0.self_link
+  ssl_certificates = [google_compute_managed_ssl_certificate.mcrt.0.self_link]
 }
 
 resource "google_compute_global_address" "lb_ip" {
@@ -94,21 +107,7 @@ resource "google_compute_global_address" "lb_ip" {
 resource "google_compute_global_forwarding_rule" "fw_rule" {
   count      = local.is_domain_name ? 1 : 0
   name       = format("forwarding-rule-%s", local.resource_name_suffix)
-  target     = google_compute_target_https_proxy.https_proxy[0].self_link
-  ip_address = google_compute_global_address.lb_ip[0].address
+  target     = google_compute_target_https_proxy.https_proxy.0.self_link
+  ip_address = google_compute_global_address.lb_ip.0.address
   port_range = "443"
-  depends_on = [google_compute_global_address.lb_ip]
-}
-
-resource "google_compute_target_https_proxy" "https_proxy" {
-  count            = local.is_domain_name ? 1 : 0
-  name             = format("https-proxy-%s", local.resource_name_suffix)
-  url_map          = google_compute_url_map.url_map[0].self_link
-  ssl_certificates = [google_compute_managed_ssl_certificate.mcrt[0].self_link]
-}
-
-resource "google_compute_managed_ssl_certificate" "mcrt" {
-  count = local.is_domain_name ? 1 : 0
-  name  = format("cert-%s", local.resource_name_suffix)
-  managed { domains = [local.bucket_name] }
 }
