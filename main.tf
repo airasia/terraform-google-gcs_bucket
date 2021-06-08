@@ -3,15 +3,16 @@ terraform {
 }
 
 locals {
-  is_domain_name        = length(regexall("[.]", var.bucket_name)) > 0 # contains a dot/period ?
-  public_read           = local.is_domain_name ? true : var.public_read
-  uniform_access        = local.is_domain_name ? true : var.uniform_access
-  enable_versioning     = local.is_domain_name ? true : var.enable_versioning
-  bucket_name           = local.is_domain_name ? var.bucket_name : format("%s-%s", var.bucket_name, var.name_suffix)
-  bucket_labels         = merge(var.labels, { "name_suffix" = var.name_suffix })
-  bucket_location       = var.location != "" ? var.location : data.google_client_config.google_client.region
-  sanitized_domain_name = replace(var.bucket_name, ".", "-")
-  resource_name_suffix  = format("%s-%s", local.sanitized_domain_name, var.name_suffix)
+  is_domain_name          = length(regexall("[.]", var.bucket_name)) > 0 # contains a dot/period ?
+  public_read             = local.is_domain_name ? true : var.public_read
+  uniform_access          = local.is_domain_name ? true : var.uniform_access
+  enable_versioning       = local.is_domain_name ? true : var.enable_versioning
+  create_bucket_lb        = local.is_domain_name
+  bucket_name             = local.is_domain_name ? var.bucket_name : format("%s-%s", var.bucket_name, var.name_suffix)
+  bucket_labels           = merge(var.labels, { "name_suffix" = var.name_suffix })
+  bucket_location         = var.location != "" ? var.location : data.google_client_config.google_client.region
+  sanitized_bucket_name   = replace(var.bucket_name, ".", "-")
+  lb_resource_name_suffix = format("%s-%s", local.sanitized_bucket_name, var.name_suffix)
 }
 
 data "google_client_config" "google_client" {}
@@ -72,42 +73,46 @@ resource "google_storage_bucket_iam_member" "object_admins" {
   member   = "group:${each.value}"
 }
 
+# Bucket LB components start here ------------------------------------------------------------------
+
 resource "google_compute_backend_bucket" "bucket_backend" {
-  count       = local.is_domain_name ? 1 : 0
-  name        = format("backend-bucket-%s", local.resource_name_suffix)
+  count       = local.create_bucket_lb ? 1 : 0
+  name        = format("backend-bucket-%s", local.lb_resource_name_suffix)
   bucket_name = local.bucket_name
 }
 
 resource "google_compute_url_map" "url_map" {
-  count           = local.is_domain_name ? 1 : 0
-  name            = format("lb-%s", local.resource_name_suffix)
+  count           = local.create_bucket_lb ? 1 : 0
+  name            = format("lb-%s", local.lb_resource_name_suffix)
   default_service = google_compute_backend_bucket.bucket_backend.0.self_link
 }
 
 resource "google_compute_managed_ssl_certificate" "mcrt" {
-  count = local.is_domain_name ? 1 : 0
-  name  = format("cert-%s", local.resource_name_suffix)
+  count = local.create_bucket_lb ? 1 : 0
+  name  = format("cert-%s", local.lb_resource_name_suffix)
   managed { domains = [local.bucket_name] }
 }
 
 resource "google_compute_target_https_proxy" "https_proxy" {
-  count            = local.is_domain_name ? 1 : 0
-  name             = format("https-proxy-%s", local.resource_name_suffix)
+  count            = local.create_bucket_lb ? 1 : 0
+  name             = format("https-proxy-%s", local.lb_resource_name_suffix)
   url_map          = google_compute_url_map.url_map.0.self_link
   ssl_certificates = [google_compute_managed_ssl_certificate.mcrt.0.self_link]
 }
 
 resource "google_compute_global_address" "lb_ip" {
-  count        = local.is_domain_name ? 1 : 0
-  name         = format("lb-ip-%s", local.resource_name_suffix)
+  count        = local.create_bucket_lb ? 1 : 0
+  name         = format("lb-ip-%s", local.lb_resource_name_suffix)
   ip_version   = "IPV4"
   address_type = "EXTERNAL"
 }
 
 resource "google_compute_global_forwarding_rule" "fw_rule" {
-  count      = local.is_domain_name ? 1 : 0
-  name       = format("forwarding-rule-%s", local.resource_name_suffix)
+  count      = local.create_bucket_lb ? 1 : 0
+  name       = format("forwarding-rule-%s", local.lb_resource_name_suffix)
   target     = google_compute_target_https_proxy.https_proxy.0.self_link
   ip_address = google_compute_global_address.lb_ip.0.address
   port_range = "443"
 }
+
+# Bucket LB components end here --------------------------------------------------------------------
