@@ -10,8 +10,8 @@ locals {
   bucket_name           = local.is_domain_name ? var.bucket_name : format("%s-%s", var.bucket_name, var.name_suffix)
   bucket_labels         = merge(var.labels, { "name_suffix" = var.name_suffix })
   bucket_location       = var.location != "" ? var.location : data.google_client_config.google_client.region
-  sanitized_domain_name = replace(var.bucket_name, ".", "-")
-  resource_name_suffix  = format("%s-%s", local.sanitized_domain_name, var.name_suffix)
+  sanitized_bucket_name = replace(var.bucket_name, ".", "-")
+  resource_name_suffix  = format("%s-%s", local.sanitized_bucket_name, var.name_suffix)
 }
 
 data "google_client_config" "google_client" {}
