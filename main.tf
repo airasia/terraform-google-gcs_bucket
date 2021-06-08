@@ -72,6 +72,8 @@ resource "google_storage_bucket_iam_member" "object_admins" {
   member   = "group:${each.value}"
 }
 
+# Bucket LB components start here ------------------------------------------------------------------
+
 resource "google_compute_backend_bucket" "bucket_backend" {
   count       = local.is_domain_name ? 1 : 0
   name        = format("backend-bucket-%s", local.resource_name_suffix)
@@ -111,3 +113,5 @@ resource "google_compute_global_forwarding_rule" "fw_rule" {
   ip_address = google_compute_global_address.lb_ip.0.address
   port_range = "443"
 }
+
+# Bucket LB components end here --------------------------------------------------------------------
