@@ -97,9 +97,9 @@ resource "google_compute_managed_ssl_certificate" "mcrt" {
 }
 
 resource "google_compute_target_https_proxy" "https_proxy" {
-  count            = local.create_bucket_lb ? 1 : 0
-  name             = format("https-proxy-%s", local.lb_resource_name_suffix)
-  url_map          = google_compute_url_map.url_map.0.self_link
+  count   = local.create_bucket_lb ? 1 : 0
+  name    = format("https-proxy-%s", local.lb_resource_name_suffix)
+  url_map = google_compute_url_map.url_map.0.self_link
   ssl_certificates = distinct(concat(
     [google_compute_managed_ssl_certificate.mcrt.0.id], local.lb_additional_cert_ids
   ))
