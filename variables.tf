@@ -44,6 +44,12 @@ variable "enable_versioning" {
   default     = false
 }
 
+variable "create_bucket_lb" {
+  description = "Whether to create a load balancer for this GCS bucket - complete with bucket-backend, forwarding rules, google managed certificate etc. Considered 'true' if 'var.bucket_name' is a domain name."
+  type        = bool
+  default     = false
+}
+
 variable "website_config" {
   description = "The default HTML pages that should be used for index and 404 pages."
   type = object({
@@ -75,4 +81,10 @@ variable "lifecycle_rules" {
     condition = map(string)
   }))
   default = []
+}
+
+variable "lb_ssl_certs" {
+  description = "A list of additional SslCertificate names that can be used for SSL connections between end-users and the bucket load balancer. These additional certificates must be available in the same GCP project as the bucket itself. These certificates will be used in addition to the google-managed certs already created by this module."
+  type        = list(string)
+  default     = []
 }
