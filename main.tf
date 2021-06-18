@@ -16,6 +16,7 @@ locals {
   lb_additional_cert_ids = [for cert_name in var.lb_ssl_certs : format(
     "projects/%s/global/sslCertificates/%s", data.google_client_config.google_client.project, cert_name
   )]
+  lb_ip_name = coalesce(var.lb_ip_name, "bucket-lbip") # for backward-compatibility only
 }
 
 data "google_client_config" "google_client" {}
@@ -107,7 +108,7 @@ resource "google_compute_target_https_proxy" "https_proxy" {
 
 resource "google_compute_global_address" "lb_ip" {
   count        = local.create_bucket_lb ? 1 : 0
-  name         = format("lb-ip-%s", local.lb_resource_name_suffix)
+  name         = format("${local.lb_ip_name}-%s", local.lb_resource_name_suffix)
   ip_version   = "IPV4"
   address_type = "EXTERNAL"
 }

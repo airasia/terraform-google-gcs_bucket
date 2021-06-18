@@ -88,3 +88,9 @@ variable "lb_ssl_certs" {
   type        = list(string)
   default     = []
 }
+
+variable "lb_ip_name" {
+  description = "Name of the static external IP that is created for the load-balancer. For backward-compatibility only. Not recommended for general use. Will be used only if \"var.create_bucket_lb\" is \"true\"."
+  type        = string
+  default     = ""
+}
