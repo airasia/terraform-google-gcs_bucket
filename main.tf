@@ -115,7 +115,7 @@ resource "google_compute_global_address" "lb_ip" {
 
 resource "google_compute_global_forwarding_rule" "fw_rule" {
   count      = local.create_bucket_lb ? 1 : 0
-  name       = format("bucket-forwarding-rule-%s", local.lb_resource_name_suffix)
+  name       = format("bucket-fwdrule-%s", local.lb_resource_name_suffix)
   target     = google_compute_target_https_proxy.https_proxy.0.self_link
   ip_address = google_compute_global_address.lb_ip.0.address
   port_range = "443"
