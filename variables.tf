@@ -94,3 +94,9 @@ variable "lb_ip_name" {
   type        = string
   default     = ""
 }
+
+variable "lb_ssl_policy" {
+  description = "A reference (self-link) to an SSLPolicy that will be associated with the bucket load-balancer (if any). If this variable is not set, a default SSL Policy (created & managed by google) will be used - which usually follows **COMPATIBLE** profile with **TLS v1.0**."
+  type        = string
+  default     = ""
+}

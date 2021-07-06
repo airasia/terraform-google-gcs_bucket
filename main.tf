@@ -104,6 +104,7 @@ resource "google_compute_target_https_proxy" "https_proxy" {
   ssl_certificates = distinct(concat(
     [google_compute_managed_ssl_certificate.mcrt.0.id], local.lb_additional_cert_ids
   ))
+  ssl_policy = var.lb_ssl_policy
 }
 
 resource "google_compute_global_address" "lb_ip" {
