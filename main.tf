@@ -92,7 +92,7 @@ resource "google_compute_url_map" "url_map" {
 }
 
 resource "google_compute_managed_ssl_certificate" "mcrt" {
-  count = local.create_bucket_lb ? 1 : 0
+  count = local.create_bucket_lb && local.is_domain_named_bucket ? 1 : 0
   name  = format("bucket-cert-%s", local.lb_resource_name_suffix)
   managed { domains = [local.bucket_name] }
 }
@@ -102,7 +102,7 @@ resource "google_compute_target_https_proxy" "https_proxy" {
   name    = format("bucket-proxy-%s", local.lb_resource_name_suffix)
   url_map = google_compute_url_map.url_map.0.self_link
   ssl_certificates = distinct(concat(
-    [google_compute_managed_ssl_certificate.mcrt.0.id], local.lb_additional_cert_ids
+    google_compute_managed_ssl_certificate.mcrt.*.id, local.lb_additional_cert_ids
   ))
   ssl_policy = var.lb_ssl_policy
 }
