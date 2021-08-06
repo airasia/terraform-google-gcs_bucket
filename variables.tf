@@ -84,7 +84,7 @@ variable "lifecycle_rules" {
 }
 
 variable "lb_ssl_certs" {
-  description = "A list of additional SslCertificate names that can be used for SSL connections between end-users and the bucket load balancer. These additional certificates must be available in the same GCP project as the bucket itself. These certificates will be used in addition to the google-managed certs already created by this module."
+  description = "A list of additional SslCertificate names that can be used for SSL connections between end-users and the bucket load balancer. These additional certificates must be available in the same GCP project as the bucket itself. These certificates will be used in addition to the google-managed certs already created (if any) by this module."
   type        = list(string)
   default     = []
 }

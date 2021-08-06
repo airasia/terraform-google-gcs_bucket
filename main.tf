@@ -3,12 +3,12 @@ terraform {
 }
 
 locals {
-  is_domain_name          = length(regexall("[.]", var.bucket_name)) > 0 # contains a dot/period ?
-  public_read             = local.is_domain_name ? true : var.public_read
-  uniform_access          = local.is_domain_name ? true : var.uniform_access
-  enable_versioning       = local.is_domain_name ? true : var.enable_versioning
-  bucket_name             = local.is_domain_name ? var.bucket_name : format("%s-%s", var.bucket_name, var.name_suffix)
-  create_bucket_lb        = local.is_domain_name ? true : var.create_bucket_lb
+  is_domain_named_bucket  = length(regexall("[.]", var.bucket_name)) > 0 # contains a dot/period ?
+  public_read             = local.is_domain_named_bucket ? true : var.public_read
+  uniform_access          = local.is_domain_named_bucket ? true : var.uniform_access
+  enable_versioning       = local.is_domain_named_bucket ? true : var.enable_versioning
+  bucket_name             = local.is_domain_named_bucket ? var.bucket_name : format("%s-%s", var.bucket_name, var.name_suffix)
+  create_bucket_lb        = local.is_domain_named_bucket ? true : var.create_bucket_lb
   bucket_labels           = merge(var.labels, { "name_suffix" = var.name_suffix })
   bucket_location         = var.location != "" ? var.location : data.google_client_config.google_client.region
   sanitized_bucket_name   = replace(var.bucket_name, ".", "-")
@@ -92,7 +92,7 @@ resource "google_compute_url_map" "url_map" {
 }
 
 resource "google_compute_managed_ssl_certificate" "mcrt" {
-  count = local.create_bucket_lb ? 1 : 0
+  count = local.create_bucket_lb && local.is_domain_named_bucket ? 1 : 0
   name  = format("bucket-cert-%s", local.lb_resource_name_suffix)
   managed { domains = [local.bucket_name] }
 }
@@ -102,7 +102,7 @@ resource "google_compute_target_https_proxy" "https_proxy" {
   name    = format("bucket-proxy-%s", local.lb_resource_name_suffix)
   url_map = google_compute_url_map.url_map.0.self_link
   ssl_certificates = distinct(concat(
-    [google_compute_managed_ssl_certificate.mcrt.0.id], local.lb_additional_cert_ids
+    google_compute_managed_ssl_certificate.mcrt.*.id, local.lb_additional_cert_ids
   ))
   ssl_policy = var.lb_ssl_policy
 }
