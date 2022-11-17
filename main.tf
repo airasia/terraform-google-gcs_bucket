@@ -11,6 +11,7 @@ locals {
   create_bucket_lb        = local.is_domain_named_bucket ? true : var.create_bucket_lb
   bucket_labels           = merge(var.labels, { "name_suffix" = var.name_suffix })
   bucket_location         = var.location != "" ? var.location : data.google_client_config.google_client.region
+  bucket_storage_class    = var.storage_class
   sanitized_bucket_name   = replace(var.bucket_name, ".", "-")
   lb_resource_name_suffix = format("%s-%s", local.sanitized_bucket_name, var.name_suffix)
   lb_additional_cert_ids = [for cert_name in var.lb_ssl_certs : format(
@@ -29,6 +30,7 @@ resource "google_project_service" "storage_api" {
 resource "google_storage_bucket" "gcs_bucket" {
   name                        = local.bucket_name
   location                    = local.bucket_location
+  storage_class               = local.bucket_storage_class 
   labels                      = local.bucket_labels
   uniform_bucket_level_access = local.uniform_access
   force_destroy               = false
