@@ -27,7 +27,7 @@ variable "location" {
 }
 
 variable "storage_class" {
-  description = "The storage class of the GCS bucket. Defaults to 'Standard' if nothing is specified here. See https://cloud.google.com/storage/docs/storage-classes."
+  description = "The storage class of the GCS bucket. Defaults to 'STANDARD' if nothing is specified here. Available options include 'STANDARD', 'MULTI_REGIONAL', 'REGIONAL', 'NEARLINE', 'COLDLINE', 'ARCHIVE'. See https://cloud.google.com/storage/docs/storage-classes."
   type        = string
   default     = "STANDARD"
 }
